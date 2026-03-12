@@ -17,5 +17,6 @@ This documentation site is the standalone operator guide for the
    metadata-and-lineage
    operator-runbook
    edit-policy-and-scenarios
+   docs-ownership-and-release
    rebuild-and-qa
    troubleshooting
