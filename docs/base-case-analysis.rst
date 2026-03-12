@@ -25,6 +25,18 @@ Base Case Output and Interpretation
 - Validate unexpected zeros/nulls by tracing:
   curve definitions -> attributes/products -> accounts -> targets.
 
+Species Code Note (PL vs PLC)
+-----------------------------
+
+- For K3Z, ``PLC`` is the canonical species code used in interpreted
+  species-wise account surfaces.
+- ``PL`` rows are intentionally excluded from promoted
+  ``tracks/accounts.csv`` during matrix-build sync using
+  ``matrix_builder.accounts_exclude_regex`` in
+  ``config/patchworks.runtime.windows.yaml``.
+- Do not interpret missing/absent ``PL`` account boxes as a model failure for
+  this instance; treat ``PLC`` as the operative lodgepole-pine series signal.
+
 Discussion
 ----------
 
