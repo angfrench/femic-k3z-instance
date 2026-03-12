@@ -21,3 +21,11 @@ data/vdyp_prep*.pkl
 
 # Docs build outputs
 docs/_build/
+
+# Patchworks transient outputs/backups
+blocks/
+output/patchworks/
+models/k3z_patchworks_model/patchworksLog.csv
+models/k3z_patchworks_model/tracks/accounts_backup_*.csv
+models/k3z_patchworks_model/yield/*_backup_*.xml
+output/patchworks_k3z_validated/*_backup_*.xml
