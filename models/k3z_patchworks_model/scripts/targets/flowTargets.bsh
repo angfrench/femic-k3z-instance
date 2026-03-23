@@ -8,9 +8,14 @@
  *************************************************************/
 
 _resolveAccountsFile() {
-   File accountsFile = AttributeStore.absoluteFile("../tracks/accounts.csv");
+   String accountsPath = "../tracks/accounts.csv";
+   if (this.interpreter != null && this.interpreter.get("tracks_path_prefix") != null) {
+      accountsPath = (String)this.interpreter.get("tracks_path_prefix") + "accounts.csv";
+   }
+
+   File accountsFile = AttributeStore.absoluteFile(accountsPath);
    if (accountsFile == null) {
-      accountsFile = new File("../tracks/accounts.csv").getAbsoluteFile();
+      accountsFile = new File(accountsPath).getAbsoluteFile();
    }
    return accountsFile;
 }
