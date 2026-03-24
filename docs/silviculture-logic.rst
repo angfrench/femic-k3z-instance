@@ -130,8 +130,8 @@ Sequencing logic:
 
 1. ``CC`` establishes the planted path.
 2. ``PCT`` is available only on the planted eligible AUs.
-3. ``PCT`` removes hardwood ingress from the planted path and leaves the
-   residual planted conifer component.
+3. ``PCT`` removes the ``HW`` species component (Western Hemlock) from the
+   planted path and leaves the residual post-PCT managed composition.
 4. ``CT`` is available only after the ``PCT`` gate is satisfied.
 5. No ``F1`` / ``F2`` / ``F3`` chain is compiled in this variant.
 

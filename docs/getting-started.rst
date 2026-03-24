@@ -142,7 +142,8 @@ The PCT->CT variant YAML controls:
 
 - PCT eligibility AUs,
 - PCT default age (currently 10),
-- post-PCT removal of HW ingress from the planted path,
+- post-PCT removal of the ``HW`` species component (Western Hemlock) from the
+  planted path,
 - CT eligibility only after the PCT gate,
 - CT age and removal assumptions without any fertilization chain.
 - deep reference: :doc:`silviculture-logic`

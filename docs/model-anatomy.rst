@@ -143,7 +143,8 @@ Additional state/config artifacts for that variant:
 Optional treatment surfaces for that variant:
 
 - ``PCT`` at age 10 by default on the planted path
-- post-PCT conifer-only managed species proportions
+- post-PCT managed species proportions with the ``HW`` species component
+  removed
 - ``CT`` available only after ``PCT``
 - matching compiled treatment products/accounts such as:
   - ``product.Treated.managed.PCT``
