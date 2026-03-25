@@ -33,7 +33,7 @@ Growth and Yield Assumptions
   - ``pctct_light`` removes ``1000`` HW stems/ha.
   - ``pctct_moderate`` removes ``2000`` HW stems/ha.
   - ``pctct_heavy`` removes ``3000`` HW stems/ha.
-- Remaining treated AUs outside that `pctct` cohort use the simplified
+- Remaining treated AUs outside that `pctct_*` cohort use the simplified
   teaching planting logic:
   FD-pair AUs use ``900 FD + 3100 HW``; CW-pair AUs use ``900 CW + 3100 HW``;
   all other remaining treated AUs use ``600 CW + 300 FD + 3100 HW``.

@@ -55,7 +55,8 @@ side.
 That design keeps ``og1`` interpretable across:
 
 - the baseline model,
-- treatment variants such as ``ctfert`` and ``pctct``, and
+- treatment variants such as ``ctfert``, ``pctct_light``,
+  ``pctct_moderate``, and ``pctct_heavy``, and
 - overlay subvariants that only alter retained area.
 
 Where the Surfaces Appear
