@@ -64,8 +64,6 @@ fertilization:
 
 qmd:
   enabled: true
-  source: "synthetic"
-  notes: "Placeholder AU-wise QMD curves for CT/fert scaffolding until observed or Nemora-derived curves are supplied."
 
 retention:
   default_retention_fraction: 0.05
