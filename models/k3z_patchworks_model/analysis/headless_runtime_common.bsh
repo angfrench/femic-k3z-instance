@@ -1,0 +1,161 @@
+/*
+ * Shared helpers for FEMIC-triggered no-GUI Patchworks runs.
+ *
+ * Contract:
+ *   args[0] = fully qualified PIN path (Patchworks standard)
+ *   args[1] = "__femic_headless__" sentinel
+ *   args[2] = reportWriter.saveStage(...) label/path
+ *   args[3] = iteration count
+ *   args[4] = objective improvement threshold
+ */
+
+boolean femicHeadlessMode = false;
+String femicHeadlessStageLabel = "headless_runs/femic";
+int femicHeadlessIterations = 1;
+double femicHeadlessImprovement = 0.0d;
+String femicHeadlessTraceLogPath = null;
+
+String femicThrowableToString(Throwable ex) {
+   java.io.StringWriter sw = new java.io.StringWriter();
+   java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+   ex.printStackTrace(pw);
+   pw.flush();
+   return sw.toString();
+}
+
+void femicHeadlessTrace(String message) {
+   String line = "[FEMIC headless] " + message;
+   print(line);
+   if (femicHeadlessTraceLogPath == null || femicHeadlessTraceLogPath.trim().length() == 0)
+      return;
+
+   java.io.PrintWriter writer = null;
+   try {
+      java.io.File traceFile = new java.io.File(femicHeadlessTraceLogPath);
+      java.io.File parent = traceFile.getParentFile();
+      if (parent != null)
+         parent.mkdirs();
+      writer = new java.io.PrintWriter(new java.io.FileWriter(traceFile, true));
+      writer.println(line);
+      writer.flush();
+   } catch (Throwable ex) {
+      print("[FEMIC headless] trace write failed: " + ex);
+   } finally {
+      if (writer != null)
+         writer.close();
+   }
+}
+
+boolean femicConfigureHeadlessFromArgs() {
+   if (args == void || args.length < 2)
+      return false;
+
+   if (!"__femic_headless__".equals(args[1]))
+      return false;
+
+   femicHeadlessMode = true;
+
+   if (args.length >= 3 && args[2] != null && args[2].trim().length() > 0)
+      femicHeadlessStageLabel = args[2].trim();
+
+   if (args.length >= 4 && args[3] != null && args[3].trim().length() > 0)
+      femicHeadlessIterations = Integer.parseInt(args[3].trim());
+
+   if (args.length >= 5 && args[4] != null && args[4].trim().length() > 0)
+      femicHeadlessImprovement = Double.parseDouble(args[4].trim());
+
+   if (args.length >= 6 && args[5] != null && args[5].trim().length() > 0)
+      femicHeadlessTraceLogPath = args[5].trim();
+
+   femicHeadlessTrace("mode enabled: stage="
+                      + femicHeadlessStageLabel
+                      + " iterations="
+                      + femicHeadlessIterations
+                      + " improvement="
+                      + femicHeadlessImprovement
+                      + " trace="
+                      + femicHeadlessTraceLogPath);
+   return true;
+}
+
+void femicRunHeadlessStage() {
+   boolean startedScheduler = false;
+   try {
+      femicHeadlessTrace("run stage entered; isSuspended=" + control.isSuspended());
+      if (femicHeadlessIterations > 0) {
+         if (control.isSuspended()) {
+            femicHeadlessTrace("scheduler suspended; issuing resume");
+            try {
+               control.resume();
+               startedScheduler = true;
+               femicHeadlessTrace("resume completed");
+            } catch (IllegalStateException ex) {
+               if (String.valueOf(ex).indexOf("Not suspended") < 0)
+                  throw ex;
+               femicHeadlessTrace("resume raced with active scheduler; continuing");
+            }
+         } else {
+            femicHeadlessTrace("scheduler already active; skip explicit resume");
+         }
+
+         if (femicHeadlessImprovement > 0.0d)
+            femicHeadlessTrace("waiting for progress: attempts="
+                               + femicHeadlessIterations
+                               + " improvement="
+                               + femicHeadlessImprovement);
+         else
+            femicHeadlessTrace("waiting for iterations: attempts="
+                               + femicHeadlessIterations);
+
+         if (femicHeadlessImprovement > 0.0d)
+            control.waitForProgress(femicHeadlessIterations, femicHeadlessImprovement);
+         else
+            control.waitForIterations(femicHeadlessIterations);
+
+         femicHeadlessTrace("wait completed; isSuspended=" + control.isSuspended());
+      } else {
+         femicHeadlessTrace("iterations <= 0; skipping scheduler wait");
+      }
+   } finally {
+      if (!control.isSuspended()) {
+         femicHeadlessTrace("issuing suspend after wait");
+         control.suspend();
+      } else if (startedScheduler) {
+         femicHeadlessTrace("scheduler already suspended before cleanup");
+      } else {
+         femicHeadlessTrace("leaving scheduler state unchanged (already suspended)");
+      }
+   }
+
+   femicHeadlessTrace("saving stage " + femicHeadlessStageLabel);
+   reportWriter.saveStage(femicHeadlessStageLabel);
+   femicHeadlessTrace("saveStage completed");
+}
+
+void femicQueueHeadlessStage() {
+   if (!femicHeadlessMode)
+      return;
+
+   Runnable worker = new Runnable() {
+      public void run() {
+         try {
+            femicHeadlessTrace("worker thread started");
+            femicHeadlessTrace("waiting until initialized");
+            control.waitUntilInitialized();
+            femicHeadlessTrace("waitUntilInitialized completed");
+            femicRunHeadlessStage();
+         } catch (InterruptedException ex) {
+            femicHeadlessTrace("stage interrupted: " + ex);
+         } catch (Throwable ex) {
+            femicHeadlessTrace("stage failed: " + ex);
+            femicHeadlessTrace(femicThrowableToString(ex));
+            ex.printStackTrace();
+         }
+      }
+   };
+
+   Thread headlessThread = new Thread(worker, "femic-headless-stage");
+   headlessThread.setDaemon(false);
+    femicHeadlessTrace("starting worker thread");
+   headlessThread.start();
+}
